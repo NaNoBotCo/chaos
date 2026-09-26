@@ -81,6 +81,10 @@ def head(title, desc, path):
 <link rel="canonical" href="{E(canon)}">
 <meta property="og:type" content="website"><meta property="og:title" content="{E(title)}">
 <meta property="og:description" content="{E(desc)}"><meta property="og:url" content="{E(canon)}">
+<meta property="og:image" content="{SITE_URL}/card.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:site_name" content="{E(NAME)}"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{E(title)}"><meta name="twitter:description" content="{E(desc)}">
+<meta name="twitter:image" content="{SITE_URL}/card.jpg">
 <meta name="theme-color" content="#07070b">
 <link rel="icon" href="{u('icon.svg')}" type="image/svg+xml">
 <style>{CSS}{EXTRA}</style></head><body>

@@ -15,6 +15,7 @@ fi
 
 python3 tools/figures.py
 SITE_URL="$SITE_URL" python3 tools/site.py
+python3 tools/card.py
 python3 tests/check_links.py || { echo "REFUSED: broken internal links"; exit 3; }
 python3 "$STYLE" build/site || { echo "REFUSED: style in built pages"; exit 4; }
 
