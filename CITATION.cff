@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "Chaos, Drawn: chaos theory in plain words, with every picture computed from the equation"
+message: "If you use these pictures, diagrams or text, cite as below and keep the credit line."
+type: software
+authors:
+  - name: "Nan"
+    website: "https://hongdam.net"
+repository-code: "https://github.com/NaNoBotCo/chaos"
+url: "https://nanobotco.github.io/chaos/"
+license: CC-BY-4.0
+date-released: "2026-09-26"
+keywords:
+  - chaos theory
+  - logistic map
+  - bifurcation
+  - Feigenbaum constant
+  - Lorenz attractor
+  - Lyapunov exponent
+  - butterfly effect
+  - law of large numbers
+  - resilience
+  - negative feedback

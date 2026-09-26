@@ -1,0 +1,15 @@
+{
+  "name": "Chaos, Drawn",
+  "short_name": "Chaos",
+  "start_url": "/chaos/",
+  "display": "standalone",
+  "background_color": "#07070b",
+  "theme_color": "#07070b",
+  "icons": [
+    {
+      "src": "/chaos/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

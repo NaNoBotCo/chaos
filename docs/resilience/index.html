@@ -1,0 +1,378 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build it to bend — resilient systems — Chaos, Drawn</title>
+<meta name="description" content="Four drawn moves for standing up to chaos you cannot predict: negative feedback, redundancy, diversification, and margin to the tipping point.">
+<link rel="canonical" href="https://nanobotco.github.io/chaos/resilience/">
+<meta property="og:type" content="website"><meta property="og:title" content="Build it to bend — resilient systems — Chaos, Drawn">
+<meta property="og:description" content="Four drawn moves for standing up to chaos you cannot predict: negative feedback, redundancy, diversification, and margin to the tipping point."><meta property="og:url" content="https://nanobotco.github.io/chaos/resilience/">
+<meta name="theme-color" content="#07070b">
+<link rel="icon" href="/chaos/icon.svg" type="image/svg+xml">
+<style>
+:root{
+ --bg:#07070b;--bg2:#0d0d14;--panel:#12121b;--ink:#f3efe6;--mute:#b3ac9e;--line:#2a2a38;
+ --chip:#1a1a26;--hot:#ffb347;--blue:#8fd0ff;--red:#ff6a5e;--gold:#ffd27a;--violet:#c8a6ff;
+ --focus:#ffd27a;--shadow:rgba(0,0,0,.6);
+ --display:"Avenir Next Condensed","HelveticaNeue-CondensedBold","Arial Narrow Bold",
+   "Franklin Gothic Heavy",Impact,system-ui,sans-serif;
+ --body:"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+ --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+ --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+ color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{font-size:18px;scroll-behavior:smooth;background:var(--bg)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;
+ -webkit-text-size-adjust:100%}
+a{color:var(--hot);text-decoration-thickness:.08em;text-underline-offset:.18em}
+a:hover{color:var(--gold)}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{
+ outline:3px solid var(--focus);outline-offset:2px;border-radius:5px}
+img,canvas,svg{max-width:100%}
+img{height:auto}
+.sr{position:absolute;left:-999px;top:0;background:var(--hot);color:#000;padding:.4rem .8rem;z-index:99}
+.sr:focus{left:.5rem;top:.5rem}
+
+/* ---- frame */
+header.top{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;
+ background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px)}
+@media (max-width:52rem){
+ header.top{transition:transform .2s ease}
+ body.nav-away header.top{transform:translateY(-100%)}}
+header.top .in{max-width:70rem;margin:0 auto;padding:.5rem 1rem;display:flex;gap:.4rem 1rem;
+ align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:.02em;
+ text-transform:uppercase;text-decoration:none;color:var(--ink);white-space:nowrap;display:flex;
+ align-items:center;gap:.45rem}
+.brand i{width:1.05rem;height:1.05rem;border-radius:50%;background:#000;
+ box-shadow:0 0 0 2px var(--hot),0 0 14px 3px color-mix(in srgb,var(--hot) 55%,transparent);display:inline-block}
+.brand b{color:var(--hot)}
+header.top nav{display:flex;gap:.1rem .66rem;flex-wrap:wrap;font-size:.74rem;
+ text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+header.top nav a{text-decoration:none;color:var(--mute);padding:.15rem 0}
+header.top nav a:hover,header.top nav a[aria-current]{color:var(--ink);box-shadow:inset 0 -3px 0 var(--hot)}
+main{max-width:70rem;margin:0 auto;padding:1rem 1rem 5rem}
+footer.bot{border-top:1px solid var(--line);margin-top:3rem;background:var(--bg2)}
+footer.bot .in{max-width:70rem;margin:0 auto;padding:1.4rem 1rem 3rem;font-size:.82rem;color:var(--mute)}
+footer.bot a{color:var(--mute)}
+footer.bot p{max-width:none}
+.fleet{margin:.6rem 0 0;line-height:1.9}.fleet a{margin-right:.55rem;white-space:nowrap}
+.support{margin:.45rem 0 0}.support a{margin-right:.5rem}
+
+/* ---- type */
+h1{font-family:var(--display);font-size:clamp(2.3rem,7vw,4.6rem);line-height:.95;margin:.4rem 0 .4rem;
+ font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
+h1 .kind{display:block;font-size:clamp(.62rem,1.6vw,.74rem);color:var(--hot);letter-spacing:.32em;
+ margin-bottom:.6rem;font-weight:800}
+h2{font-family:var(--display);font-size:clamp(1.4rem,3.2vw,1.9rem);margin:2.4rem 0 .6rem;font-weight:800;
+ text-transform:uppercase;letter-spacing:.01em;border-bottom:2px solid var(--line);padding-bottom:.25rem}
+h2 small{font-family:var(--body);font-size:.6em;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400;margin-left:.6rem}
+h3{font-family:var(--display);font-size:1.15rem;margin:1.4rem 0 .3rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+.lede{font-size:clamp(1.1rem,2.3vw,1.32rem);max-width:44rem;margin:.4rem 0 1rem;color:var(--ink)}
+.mute{color:var(--mute)}.small{font-size:.82rem}
+p{margin:.6rem 0;max-width:44rem}
+.prose p,.prose ul,.prose ol{max-width:44rem}
+.prose li{margin:.3rem 0}
+.prose strong{color:var(--gold)}
+.prose h3{margin-top:1.8rem}
+dfn{font-style:normal;border-bottom:1px dotted var(--mute);cursor:help}
+sup.src{font-size:.62em;vertical-align:super;line-height:0}
+sup.src a{text-decoration:none;color:var(--blue);padding:0 .1em}
+code,kbd{font-family:var(--mono);font-size:.9em;background:var(--chip);padding:.05em .35em;border-radius:4px}
+pre{background:var(--chip);border:1px solid var(--line);padding:.8rem 1rem;overflow-x:auto;font-size:.82rem;
+ line-height:1.5;border-radius:8px;max-width:44rem}
+pre code{background:none;padding:0}
+.eq{font-family:var(--serif);font-size:1.2rem;text-align:center;margin:1rem auto;max-width:44rem;
+ background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;overflow-x:auto;
+ line-height:1.9}
+.eq var{font-style:italic}
+.eq .where{display:block;font-family:var(--body);font-size:.78rem;color:var(--mute);margin-top:.35rem;text-align:left;line-height:1.55}
+blockquote{margin:1.5rem 0;padding:0 0 0 1.1rem;border-left:3px solid var(--hot);max-width:44rem;color:var(--ink)}
+blockquote p{font-family:var(--serif);font-size:1.15rem;line-height:1.55}
+blockquote footer{font-size:.8rem;color:var(--mute);margin-top:.3rem}
+blockquote .de{color:var(--mute);font-size:1rem;font-style:italic}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+table{border-collapse:collapse;width:100%;margin:.8rem 0 1.4rem;font-size:.92rem}
+th{text-align:left;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);
+ border-bottom:2px solid var(--line);padding:.4rem .5rem .4rem 0;font-weight:700;vertical-align:bottom}
+td{border-bottom:1px solid var(--line);padding:.5rem .5rem .5rem 0;vertical-align:top}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:hover td{background:color-mix(in srgb,var(--hot) 8%,transparent)}
+.tw{overflow-x:auto;margin:.8rem 0 1.4rem}
+.tw table{margin:0;min-width:36rem}
+.year{font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--hot);white-space:nowrap}
+.tag{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;
+ padding:.12rem .5rem;border-radius:99px;background:var(--chip);color:var(--mute);border:1px solid var(--line);
+ vertical-align:middle}
+.tag.hot{color:#000;background:var(--hot);border-color:var(--hot)}
+.tag.blue{color:#000;background:var(--blue);border-color:var(--blue)}
+
+/* ---- the big numbers */
+.slab{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:2px;
+ background:var(--line);border:1px solid var(--line);margin:1.4rem 0;border-radius:12px;overflow:hidden}
+.slab div{padding:.85rem .9rem;background:var(--panel)}
+.slab b{display:block;font-family:var(--display);font-size:clamp(1.8rem,5vw,2.7rem);line-height:.95;
+ font-weight:800;color:var(--hot);letter-spacing:-.01em}
+.slab b small{font-size:.5em;color:var(--mute);font-weight:700;margin-left:.15em}
+.slab span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;
+ color:var(--mute);font-weight:800;margin-top:.3rem}
+
+/* ---- cards and the linked-image formula
+   Four layers bottom to top: the picture as a background; a scrim heaviest where the words
+   sit; a spacer that gives the box its height, because a background has none; the text.
+   The whole box is the link. */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:1rem;margin:1.2rem 0}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(20rem,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;
+ background-attachment:fixed}
+.card p{font-size:.92rem;color:var(--mute);margin:.4rem 0 0}
+.card figure.thumb{position:relative;margin:-.9rem -1rem .7rem;border-bottom:1px solid var(--line);
+ border-radius:14px 14px 0 0;overflow:hidden}
+.card figure.thumb h3{margin:0;font-size:1.05rem}
+.card h3{margin:.2rem 0 .1rem}
+.card h3 a{text-decoration:none;color:var(--ink)}
+.card h3 a:hover{color:var(--hot)}
+.shot{position:relative;display:block;overflow:hidden;text-decoration:none;background-color:#000;isolation:isolate}
+.shot .bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;
+ transition:scale .9s cubic-bezier(.2,.7,.2,1)}
+.shot .scrim{position:absolute;inset:0;background:linear-gradient(180deg,
+ rgba(7,7,11,.05) 0%,rgba(7,7,11,.12) 40%,rgba(7,7,11,.62) 74%,rgba(7,7,11,.92) 100%)}
+.shot .sp{display:block;padding-top:58%}
+.shot .tx{position:absolute;left:0;right:0;bottom:0;padding:.55rem .8rem;color:#fff;
+ font-family:var(--display);font-weight:800;font-size:1.25rem;line-height:1.08;text-transform:uppercase;
+ letter-spacing:.01em;text-shadow:0 2px 14px rgba(0,0,0,.9)}
+.shot .tx small{display:block;font-family:var(--body);text-transform:none;font-weight:400;font-size:.72rem;
+ color:#e7e1d6;letter-spacing:0;margin-top:.2rem}
+.shot:hover .bg{scale:1.05}
+.shot:hover .tx{text-decoration:underline;text-underline-offset:.16em}
+.shot:focus-visible{outline:3px solid var(--hot);outline-offset:-3px}
+.cred{font-size:.66rem;color:var(--mute)}
+@media (prefers-reduced-motion:reduce){.shot .bg{transition:none}.shot:hover .bg{scale:1}}
+
+/* ---- parallax bands
+   The picture holds still while the page moves over it: background-attachment fixed. Off for
+   coarse pointers and reduced motion, where it degrades to a plain cover image. */
+.band{position:relative;isolation:isolate;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);width:100vw;
+ min-height:clamp(280px,56vh,560px);display:grid;align-items:center;
+ background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;
+ background-color:#000;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-block:2.8rem}
+.band::before{content:"";position:absolute;inset:0;z-index:-2;
+ background:linear-gradient(180deg,rgba(7,7,11,.78) 0%,rgba(7,7,11,.28) 38%,rgba(7,7,11,.40) 62%,rgba(7,7,11,.88) 100%)}
+.band::after{content:"";position:absolute;inset:0;z-index:-1;
+ background:linear-gradient(90deg,rgba(7,7,11,.55),transparent 58%)}
+.band .in{max-width:70rem;margin:0 auto;padding:clamp(2rem,6vw,4.4rem) 1rem;width:100%}
+.band .kicker{display:block;font-family:var(--display);font-size:.72rem;font-weight:800;
+ letter-spacing:.34em;text-transform:uppercase;color:var(--hot);margin-bottom:.7rem}
+.band h2{font-family:var(--display);font-size:clamp(2rem,6.5vw,3.9rem);line-height:.96;margin:0 0 .5rem;border:0;
+ color:#fff;text-transform:uppercase;letter-spacing:-.01em;text-shadow:0 2px 26px rgba(0,0,0,.7);max-width:22ch;padding:0}
+.band p{color:#f2ede4;font-size:clamp(1rem,2.2vw,1.22rem);max-width:36ch;margin:.3rem 0 0;text-shadow:0 1px 14px rgba(0,0,0,.8)}
+.band .big{font-family:var(--display);font-size:clamp(3rem,11vw,7.5rem);line-height:.86;font-weight:800;color:#fff;
+ margin:0;text-shadow:0 3px 34px rgba(0,0,0,.7);letter-spacing:-.02em}
+.band .big small{display:block;font-family:var(--body);font-size:.16em;letter-spacing:.24em;text-transform:uppercase;
+ color:var(--hot);margin-top:.5rem;font-weight:800}
+.band blockquote{border:0;padding:0;margin:0;max-width:40rem}
+.band blockquote p{font-size:clamp(1.3rem,3.4vw,2.1rem);line-height:1.3;color:#fff;max-width:none}
+.band blockquote .de{color:#d7d0c4;font-size:clamp(.95rem,2vw,1.15rem)}
+.band blockquote footer{color:#d7d0c4}
+.band .cred{position:absolute;right:0;bottom:0;z-index:1;font-size:.62rem;color:#cfc8bb;
+ background:rgba(7,7,11,.72);padding:.22rem .55rem;max-width:72%}
+.band .cred a{color:#e6dfd3}
+.band.right .in{text-align:right;display:flex;flex-direction:column;align-items:flex-end}
+.band.right::after{background:linear-gradient(270deg,rgba(7,7,11,.55),transparent 58%)}
+.band.tall{min-height:clamp(380px,78vh,760px)}
+.band.short{min-height:clamp(200px,36vh,340px)}
+.btn{display:inline-block;font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+ font-size:.9rem;padding:.55rem 1rem;border:2px solid var(--hot);color:var(--hot);text-decoration:none;border-radius:99px;
+ background:rgba(7,7,11,.5)}
+.btn:hover{background:var(--hot);color:#000}
+.btn.solid{background:var(--hot);color:#000}
+.btn.solid:hover{background:var(--gold);border-color:var(--gold)}
+.band .btn{margin-top:1.3rem}
+@media (pointer:coarse),(prefers-reduced-motion:reduce){.band,.card,.panel{background-attachment:scroll}}
+@media print{.band{display:none}}
+
+/* ---- figures */
+figure.fig{margin:1.4rem 0;border:1px solid var(--line);background:var(--panel);border-radius:14px;overflow:hidden}
+figure.fig img,figure.fig svg{display:block;width:100%;height:auto}
+figure.fig svg{background:var(--panel)}
+figure.fig figcaption{padding:.6rem .9rem .7rem;font-size:.8rem;color:var(--mute);border-top:1px solid var(--line);line-height:1.5}
+figure.fig figcaption b{color:var(--ink)}
+figure.fig figcaption a{color:var(--mute)}
+figure.fig.dark svg{background:#000}
+.pair{display:grid;grid-template-columns:1fr;gap:1rem;margin:1.2rem 0}
+@media (min-width:44rem){.pair{grid-template-columns:1fr 1fr}}
+.pair figure.fig{margin:0}
+.three{display:grid;grid-template-columns:1fr;gap:1rem;margin:1.2rem 0}
+@media (min-width:44rem){.three{grid-template-columns:1fr 1fr 1fr}}
+.three figure.fig{margin:0}
+.dl{font-size:.74rem}
+.dl a{margin-right:.6rem}
+
+/* ---- generators */
+.gen{border:1px solid var(--line);border-radius:14px;background:var(--panel);margin:1.4rem 0;overflow:hidden}
+.gen .stage{background:#000;position:relative}
+.gen canvas{display:block;width:100%;height:auto;background:#000}
+.gen .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.6rem 1.2rem;padding:.9rem 1rem;
+ border-top:1px solid var(--line)}
+.gen label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);font-weight:800}
+.gen label output{color:var(--hot);float:right;font-variant-numeric:tabular-nums;text-transform:none;letter-spacing:0}
+.gen input[type=range]{width:100%;accent-color:var(--hot);margin:.2rem 0 0}
+.gen select{width:100%;background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:8px;
+ padding:.35rem .5rem;font:inherit;font-size:.9rem}
+.gen .row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;padding:.6rem 1rem .9rem;border-top:1px solid var(--line)}
+.gen button,.quiz button{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+ font-size:.88rem;padding:.5rem .9rem;border:2px solid var(--hot);color:var(--hot);background:transparent;
+ border-radius:99px;cursor:pointer}
+.gen button:hover,.quiz button:hover{background:var(--hot);color:#000}
+.gen button[aria-pressed="true"]{background:var(--hot);color:#000}
+.gen button.ghost{border-color:var(--line);color:var(--mute)}
+.gen .read{font-family:var(--mono);font-size:.78rem;color:var(--mute);padding:.5rem 1rem .8rem;line-height:1.7;
+ border-top:1px solid var(--line);white-space:pre-wrap}
+.gen .read b{color:var(--hot);font-weight:700}
+.gen .note{font-size:.8rem;color:var(--mute);padding:.5rem 1rem .8rem;border-top:1px solid var(--line);margin:0;max-width:none}
+.gen .stage .hud{position:absolute;left:.6rem;top:.5rem;font-family:var(--mono);font-size:.7rem;color:#cfc8bb;
+ background:rgba(0,0,0,.55);padding:.2rem .45rem;border-radius:6px;pointer-events:none}
+.gen .stage .nowebgl{color:var(--ink);padding:2rem 1rem;text-align:center}
+.presets{display:flex;gap:.4rem;flex-wrap:wrap;padding:.7rem 1rem 0}
+.presets button{font-size:.72rem;padding:.3rem .7rem;border-color:var(--line);color:var(--mute)}
+.presets button:hover{border-color:var(--hot)}
+
+/* ---- the quiz */
+.quiz{border:1px solid var(--line);border-radius:14px;background:var(--panel);margin:1.4rem 0;padding:1rem 1.1rem 1.2rem}
+.quiz .q{font-family:var(--display);font-size:clamp(1.3rem,3vw,1.7rem);text-transform:uppercase;margin:.3rem 0 .8rem;line-height:1.1}
+.quiz .q small{display:block;font-family:var(--body);font-size:.68rem;letter-spacing:.14em;color:var(--hot);margin-bottom:.4rem}
+.quiz .opts{display:grid;gap:.5rem;grid-template-columns:1fr}
+@media (min-width:44rem){.quiz .opts{grid-template-columns:1fr 1fr}}
+.quiz .opts button{text-align:left;text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:500;
+ font-size:1rem;padding:.7rem .9rem;border-radius:12px;border-color:var(--line);color:var(--ink);line-height:1.4}
+.quiz .opts button:hover{border-color:var(--hot);background:color-mix(in srgb,var(--hot) 12%,transparent);color:var(--ink)}
+.quiz .bar{height:4px;background:var(--line);border-radius:2px;margin:.2rem 0 1rem;overflow:hidden}
+.quiz .bar i{display:block;height:100%;background:var(--hot);width:0;transition:width .3s}
+.quiz .res h3{font-size:clamp(1.6rem,4vw,2.4rem);color:var(--hot);margin:.2rem 0 .3rem}
+.quiz .res .kick{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);font-weight:800}
+.quiz .res p{max-width:none}
+.quiz .res .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:.6rem;margin:.9rem 0}
+.quiz .res .facts div{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:.5rem .7rem;font-size:.85rem}
+.quiz .res .facts b{display:block;color:var(--gold);font-family:var(--display);font-size:1.25rem}
+.quiz .res .also{font-size:.82rem;color:var(--mute)}
+.quiz .row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+.quiz canvas{display:block;width:100%;max-width:26rem;height:auto;border-radius:12px;margin:.4rem 0 .6rem;background:#000}
+
+/* ---- timeline */
+.tl{list-style:none;margin:1rem 0;padding:0;border-left:2px solid var(--line);max-width:46rem}
+.tl li{position:relative;padding:.1rem 0 1.1rem 1.4rem}
+.tl li::before{content:"";position:absolute;left:-7px;top:.55rem;width:12px;height:12px;border-radius:50%;
+ background:var(--bg);border:2px solid var(--hot)}
+.tl li.big::before{background:var(--hot);box-shadow:0 0 0 4px color-mix(in srgb,var(--hot) 30%,transparent)}
+.tl .year{display:block;font-size:.95rem;line-height:1.2}
+.tl b.who{color:var(--gold)}
+.tl p{margin:.15rem 0 0;font-size:.95rem}
+
+/* ---- callouts */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin:1.2rem 0;
+ background-attachment:fixed}
+.panel.glow{background-image:radial-gradient(120% 100% at 0% 0%,color-mix(in srgb,var(--hot) 14%,transparent),transparent 60%)}
+.panel.blue{background-image:radial-gradient(120% 100% at 100% 0%,color-mix(in srgb,var(--blue) 14%,transparent),transparent 60%)}
+.panel h3{margin-top:.2rem}
+.panel p{max-width:none}
+.steps{counter-reset:s;list-style:none;padding:0;margin:1rem 0;max-width:46rem}
+.steps li{position:relative;padding:.2rem 0 1rem 3rem;min-height:2.6rem}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:.05rem;width:2.1rem;height:2.1rem;
+ border-radius:50%;background:var(--hot);color:#000;font-family:var(--display);font-weight:800;font-size:1.2rem;
+ display:grid;place-items:center}
+.steps li b{color:var(--gold)}
+.two{display:grid;grid-template-columns:1fr;gap:1rem 2rem}
+@media (min-width:52rem){.two{grid-template-columns:1fr 1fr}}
+.toc{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0}
+.toc a{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;text-decoration:none;
+ border:1px solid var(--line);padding:.3rem .7rem;border-radius:99px;color:var(--mute)}
+.toc a:hover{border-color:var(--hot);color:var(--ink)}
+.legend{display:flex;gap:.9rem;flex-wrap:wrap;font-size:.78rem;color:var(--mute);margin:.4rem 0}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:3px;vertical-align:-.1em;margin-right:.3rem}
+.abyss{font-family:var(--serif);font-size:clamp(1.15rem,2.6vw,1.6rem);line-height:1.45;max-width:36rem;color:var(--ink);margin:1.5rem 0}
+.abyss .de{display:block;font-size:.72em;color:var(--mute);font-style:italic;margin-top:.5rem}
+.abyss footer{font-family:var(--body);font-size:.78rem;color:var(--mute);margin-top:.5rem}
+
+.reading{max-width:44rem;margin:.1rem 0 1.2rem;color:var(--ink);font-size:1rem}
+.reading b{color:var(--gold);font-weight:700}
+.eq var{font-style:italic}
+.eq sub{font-size:.7em}
+.eq .op{color:var(--mute);padding:0 .12em}
+.win{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--hot);
+ border-radius:12px;padding:1rem 1.1rem;margin:1.3rem 0;background-image:radial-gradient(120% 100% at 0% 0%,color-mix(in srgb,var(--hot) 12%,transparent),transparent 60%)}
+.win h3{margin-top:.1rem}
+.win p{max-width:none}
+.srclist{padding-left:1.6rem;max-width:52rem}
+.srclist li{margin:.5rem 0;font-size:.9rem;line-height:1.5;color:var(--ink)}
+.srclist li a{color:var(--blue);text-decoration:none}
+.dial{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;max-width:44rem;margin:1rem 0;font-size:.95rem}
+.dial dt{font-family:var(--display);font-weight:800;color:var(--hot);text-transform:uppercase;font-size:.8rem;letter-spacing:.06em;padding-top:.35rem}
+.dial dd{margin:0;padding:.25rem 0;border-bottom:1px solid var(--line)}
+figure.fig svg{display:block;width:100%;height:auto}
+.next{display:flex;justify-content:space-between;gap:1rem;margin:2.4rem 0 0;flex-wrap:wrap}
+.next a{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;
+ border:1px solid var(--line);padding:.6rem 1rem;border-radius:99px;color:var(--ink)}
+.next a:hover{border-color:var(--hot);color:var(--hot)}
+</style></head><body>
+<a class="sr" href="#main">Skip to the content</a>
+<header class="top"><div class="in">
+<a class="brand" href="/chaos/"><i></i>Chaos, <b>Drawn</b></a>
+<nav aria-label="Chapters"><a href="/chaos/one/">The one idea</a><a href="/chaos/map/">The map</a><a href="/chaos/weather/">Weather</a><a href="/chaos/large-numbers/">Large numbers</a><a href="/chaos/resilience/" aria-current=page>Resilience</a><a href="/chaos/code/">Code</a><a href="/chaos/words/">Words</a><a href="/chaos/sources/">Sources</a></nav>
+</div></header><main id="main">
+<h1><span class="kind">Chapter 5 · Tool two</span>Build it to bend</h1>
+<p class="lede">You cannot predict the shock. You can build the thing that takes it and keeps going.
+A resilient system does not need to see the future — it is shaped so the future cannot break it.
+Four moves, each one drawn.</p>
+
+<h2>Move one — pull back to centre</h2>
+<p>The oldest trick in engineering: measure how far off you are and push back a share of it, every
+tick. A woodstove with a thermostat. A hand on a wheel on a washboard road. James Clerk Maxwell wrote
+the mathematics of it in 1868 and started a whole field.<sup class="src"><a href="/chaos/sources/#maxwell1868">20</a></sup></p>
+
+<figure class="fig dark"><svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid meet" style="background:#050507"><rect x="64" y="26" width="830" height="342" fill="#050507"/><line x1="64" y1="26" x2="64" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="64" y1="368" x2="64" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="64" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">0</text><line x1="236.92" y1="26" x2="236.92" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="236.92" y1="368" x2="236.92" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="236.92" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">50</text><line x1="409.83" y1="26" x2="409.83" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="409.83" y1="368" x2="409.83" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="409.83" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">100</text><line x1="582.75" y1="26" x2="582.75" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="582.75" y1="368" x2="582.75" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="582.75" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">150</text><line x1="755.67" y1="26" x2="755.67" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="755.67" y1="368" x2="755.67" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="755.67" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">200</text><line x1="64" y1="353.24" x2="894" y2="353.24" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="353.24" x2="64" y2="353.24" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="357.2" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">-15</text><line x1="64" y1="301.16" x2="894" y2="301.16" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="301.16" x2="64" y2="301.16" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="305.2" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">-10</text><line x1="64" y1="249.08" x2="894" y2="249.08" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="249.08" x2="64" y2="249.08" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="253.1" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">-5</text><line x1="64" y1="197" x2="894" y2="197" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="197" x2="64" y2="197" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="201.0" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0</text><line x1="64" y1="144.92" x2="894" y2="144.92" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="144.92" x2="64" y2="144.92" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="148.9" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">5</text><line x1="64" y1="92.84" x2="894" y2="92.84" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="92.84" x2="64" y2="92.84" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="96.8" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">10</text><line x1="64" y1="40.76" x2="894" y2="40.76" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="40.76" x2="64" y2="40.76" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="44.8" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">15</text><rect x="64" y="26" width="830" height="342" fill="none" stroke="#2a2a38" stroke-width="1.5"/><text x="479.0" y="406" fill="#f3efe6" font-size="15" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">step</text><text x="18" y="197.0" fill="#f3efe6" font-size="15" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif" transform="rotate(-90 18 197.0)">distance from where it should be</text><text x="64" y="17" fill="#f3efe6" font-size="15" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">Same shocks, two tanks</text><line x1="64" y1="197" x2="894" y2="197" stroke="#b3ac9e" stroke-width="1" stroke-dasharray="4 6" opacity="1.0"/><polyline points="64,194.45 67.46,193.44 70.92,191.85 74.38,189.09 77.83,196.03 81.29,199.38 84.75,199.14 88.21,201.86 91.67,201.42 95.12,205.58 98.58,204 102.04,203.19 105.5,204.57 108.96,194.2 112.42,201.17 115.88,192.81 119.33,183.79 122.79,182.9 126.25,179.87 129.71,174.4 133.17,179.47 136.62,183.13 140.08,180.13 143.54,179.22 147,171.69 150.46,173.86 153.92,172.7 157.38,174.01 160.83,168.16 164.29,162.41 167.75,167.3 171.21,166.31 174.67,168.36 178.12,164.71 181.58,158.92 185.04,164.75 188.5,152.07 191.96,146.72 195.42,132.65 198.88,138.86 202.33,144.95 205.79,146.89 209.25,146.05 212.71,136.86 216.17,129.56 219.62,125.5 223.08,123.89 226.54,121.43 230,126.89 233.46,130.4 236.92,138.4 240.38,132.66 243.83,129.11 247.29,129.31 250.75,133.02 254.21,128.2 257.67,135.23 261.12,132.99 264.58,135.58 268.04,148.33 271.5,149.98 274.96,156.43 278.42,153.96 281.88,153.38 285.33,154.92 288.79,155.46 292.25,159.75 295.71,156.3 299.17,151.86 302.62,154.86 306.08,161.18 309.54,158.87 313,158.09 316.46,152.42 319.92,149.85 323.38,143.5 326.83,133.86 330.29,135.49 333.75,129.77 337.21,128.78 340.67,132.41 344.12,124.62 347.58,112.64 351.04,116.75 354.5,120.67 357.96,112.4 361.42,111.58 364.88,110.46 368.33,112.78 371.79,121.27 375.25,122.58 378.71,124.41 382.17,127.26 385.62,129.76 389.08,130.86 392.54,139.46 396,144.15 399.46,140.51 402.92,144.68 406.38,147.62 409.83,142.14 413.29,139.06 416.75,147.47 420.21,151.45 423.67,149.49 427.12,155.81 430.58,154.67 434.04,145.49 437.5,152.89 440.96,158.55 444.42,156.04 447.88,157.52 451.33,162.21 454.79,164.43 458.25,171.46 461.71,166.6 465.17,166.61 468.62,162.29 472.08,165.54 475.54,166.91 479,169.46 482.46,176.56 485.92,181.41 489.37,179.77 492.83,184.7 496.29,179.82 499.75,184.93 503.21,192.36 506.67,197.69 510.12,218.53 513.58,224.75 517.04,238.04 520.5,231.22 523.96,239.86 527.42,248.45 530.88,252.86 534.33,242.57 537.79,239.66 541.25,250.59 544.71,251.85 548.17,255.49 551.62,262.7 555.08,262.16 558.54,268.72 562,263.82 565.46,265.13 568.92,261.72 572.38,251.37 575.83,254.07 579.29,256.09 582.75,252.96 586.21,254.11 589.67,252.88 593.12,250.14 596.58,247.06 600.04,250.66 603.5,244.98 606.96,242.45 610.42,254.64 613.88,255.36 617.33,248.64 620.79,252.96 624.25,257.88 627.71,251.95 631.17,255.46 634.62,251.3 638.08,248.39 641.54,240.95 645,250.29 648.46,251.85 651.92,256.31 655.38,260.2 658.83,267.4 662.29,268.7 665.75,271.81 669.21,275.88 672.67,277.74 676.12,284.93 679.58,288.44 683.04,282.57 686.5,287.19 689.96,285.42 693.42,294.29 696.88,283.81 700.33,279.61 703.79,281.15 707.25,281.46 710.71,288.01 714.17,284.81 717.62,288.86 721.08,289.2 724.54,292.32 728,293.27 731.46,281.1 734.92,280.5 738.38,284.97 741.83,284.71 745.29,287.09 748.75,291.53 752.21,294.26 755.67,296.86 759.12,300.98 762.58,293.76 766.04,303.3 769.5,299.94 772.96,301.81 776.42,304.73 779.88,308.39 783.33,322.31 786.79,319.6 790.25,320.26 793.71,312.14 797.17,318.47 800.62,312.8 804.08,314.7 807.54,316.03 811,316.69 814.46,319.73 817.92,311.64 821.38,314.72 824.83,313.07 828.29,319.21 831.75,323.83 835.21,323.91 838.67,319.21 842.12,312.58 845.58,320.7 849.04,325.2 852.5,326.9 855.96,321.85 859.42,333.4 862.88,329.39 866.33,333.42 869.79,333.17 873.25,341.45 876.71,349.23 880.17,352.45 883.62,339.19 887.08,342.41 890.54,345.56" fill="none" stroke="#ff6a5e" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="1.0"/><polyline points="64,195.16 67.46,194.95 70.92,194.38 74.38,193.12 77.83,199.21 81.29,201.01 84.75,199.71 88.21,200.91 91.67,199.5 95.12,201.79 98.58,199.32 102.04,198.08 105.5,198.77 108.96,190.81 112.42,197.56 115.88,191.39 119.33,186.46 122.79,188.77 126.25,188.89 129.71,187.22 133.17,193.61 136.62,197.2 140.08,194.98 143.54,194.89 147,190.06 150.46,193.57 153.92,193.69 157.38,195.56 160.83,191.75 164.29,189.08 167.75,194.82 171.21,194.72 174.67,196.83 178.12,194.25 181.58,190.85 185.04,196.77 188.5,187.7 191.96,186.46 195.42,179.28 198.88,188.71 202.33,195.42 205.79,197.26 209.25,196.58 212.71,190.08 216.17,186.76 219.62,186.71 223.08,188.43 226.54,189.05 230,195.21 233.46,198.24 236.92,203.65 240.38,197.66 243.83,194.91 247.29,195.64 250.75,198.7 254.21,194.75 257.67,200.44 261.12,197.87 264.58,199.49 268.04,207.97 271.5,206.08 274.96,208.19 278.42,203.28 281.88,201.1 285.33,201.06 288.79,200.31 292.25,202.48 295.71,198.45 299.17,194.85 302.62,197.62 306.08,201.99 309.54,198.93 313,197.83 316.46,193.51 319.92,192.64 323.38,189.29 326.83,184.51 330.29,189.18 333.75,187.25 337.21,189.26 340.67,194.05 344.12,189.26 347.58,182.81 351.04,189.74 354.5,194.59 357.96,189.31 361.42,190.88 364.88,191.78 368.33,194.91 371.79,201.61 375.25,201.27 378.71,201.39 382.17,202.21 385.62,202.55 389.08,201.79 392.54,206.64 396,207.32 399.46,201.81 402.92,203.46 406.38,203.77 409.83,197.93 413.29,195.45 416.75,201.94 420.21,203.42 423.67,200.21 427.12,203.87 430.58,201.12 434.04,193.36 437.5,199.7 440.96,203.02 444.42,199.53 447.88,199.89 451.33,202.46 454.79,202.53 458.25,206.04 461.71,200.01 465.17,199.17 468.62,195.45 472.08,198.23 475.54,198.87 479,200.18 482.46,204.41 485.92,205.82 489.37,202.17 492.83,204.28 496.29,198.72 499.75,201.92 503.21,205.89 506.67,207.24 510.12,219.38 513.58,217.59 517.04,221.39 520.5,209.65 523.96,212.33 527.42,214.22 530.88,212.58 534.33,200.8 537.79,197.64 541.25,205.33 544.71,203.91 548.17,204.6 551.62,207.66 555.08,204.29 558.54,206.97 562,200.65 565.46,200.57 568.92,197.11 572.38,189.63 575.83,193.64 579.29,196.04 582.75,194.05 586.21,195.7 589.67,195.18 593.12,193.72 596.58,192.42 600.04,196.3 603.5,192.4 606.96,191.86 610.42,202.08 613.88,201.18 617.33,195.17 620.79,198.79 624.25,201.83 627.71,196.21 631.17,198.96 634.62,195.42 638.08,193.76 641.54,189.31 645,198.19 648.46,198.98 651.92,201.63 655.38,203.14 658.83,206.6 662.29,204.85 665.75,204.9 669.21,205.61 672.67,204.54 676.12,207.61 679.58,207.16 683.04,200.09 686.5,202.55 689.96,199.72 693.42,205.35 696.88,195.47 700.33,192.87 703.79,195.13 707.25,195.88 710.71,200.91 714.17,197.51 717.62,200.28 721.08,199.61 724.54,201.13 728,200.65 731.46,190.87 734.92,192.16 738.38,196.73 741.83,196.62 745.29,198.44 748.75,201.23 752.21,202.01 755.67,202.48 759.12,203.91 762.58,196.78 766.04,203.71 769.5,199.41 772.96,200.08 776.42,201.32 779.88,202.74 783.33,211.16 786.79,205.24 790.25,203.41 793.71,195.77 797.17,200.67 800.62,195.57 804.08,197.33 807.54,198.2 811,198.34 814.46,200.15 817.92,193.45 821.38,196.66 824.83,195.56 828.29,200.39 831.75,202.77 835.21,201.21 838.67,196.64 842.12,191.97 845.58,199.23 849.04,201.84 852.5,201.71 855.96,196.75 859.42,205.14 862.88,199.98 866.33,202.04 869.79,200.45 873.25,205.45 876.71,208.68 880.17,207.73 883.62,195.18 887.08,198.01 890.54,199.99" fill="none" stroke="#8fe0a8" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" opacity="1.0"/><text x="485" y="161.46" fill="#ff6a5e" font-size="13" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">no feedback — it wanders off</text><text x="485" y="96.95" fill="#8fe0a8" font-size="13" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">pulls back 28% each step — it holds</text></svg><figcaption><b>Fig 10.</b> Two tanks take the very same run of random shocks. One just piles them up and wanders off (it drifted to 6.92 from centre). The other subtracts a fraction of its own error every step and stays put (it held to 0.61). Same shocks. One rule of feedback between them. <span class="small">· computed here · Nan · hongdam.net · CC BY 4.0</span></figcaption></figure>
+
+<div class="eq">error<sub>next</sub> <span class="op">=</span> (1 − <var>k</var>) <span class="op">·</span> error<sub>now</sub></div><p class="reading"><b>Reading it:</b> each step, keep only the fraction (1 − <var>k</var>) of the error you had. As long as the pull-back <var>k</var> is between 0 and 2, the error dies away on its own. Pull too hard, past 2, and you overshoot worse each time — feedback wired backwards makes its own chaos.</p>
+
+<h2>Move two — keep spares</h2>
+<p>If one part fails one time in ten, two that fail on their own both fail only one time in a hundred;
+three, one in a thousand. Independence is a fierce multiplier — <em>if</em> you can keep it.</p>
+
+<figure class="fig dark"><svg viewBox="0 0 960 440" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid meet" style="background:#050507"><rect x="64" y="26" width="830" height="362" fill="#050507"/><line x1="64" y1="26" x2="64" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="64" y1="388" x2="64" y2="393" stroke="#b3ac9e" stroke-width="1"/><text x="64" y="408" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">1</text><line x1="230" y1="26" x2="230" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="230" y1="388" x2="230" y2="393" stroke="#b3ac9e" stroke-width="1"/><text x="230" y="408" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">2</text><line x1="396" y1="26" x2="396" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="396" y1="388" x2="396" y2="393" stroke="#b3ac9e" stroke-width="1"/><text x="396" y="408" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">3</text><line x1="562" y1="26" x2="562" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="562" y1="388" x2="562" y2="393" stroke="#b3ac9e" stroke-width="1"/><text x="562" y="408" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">4</text><line x1="728" y1="26" x2="728" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="728" y1="388" x2="728" y2="393" stroke="#b3ac9e" stroke-width="1"/><text x="728" y="408" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">5</text><line x1="894" y1="26" x2="894" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="894" y1="388" x2="894" y2="393" stroke="#b3ac9e" stroke-width="1"/><text x="894" y="408" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">6</text><line x1="64" y1="388" x2="894" y2="388" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="388" x2="64" y2="388" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="392.0" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">1e-06</text><line x1="64" y1="327.67" x2="894" y2="327.67" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="327.67" x2="64" y2="327.67" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="331.7" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">1e-05</text><line x1="64" y1="267.33" x2="894" y2="267.33" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="267.33" x2="64" y2="267.33" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="271.3" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.0001</text><line x1="64" y1="207" x2="894" y2="207" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="207" x2="64" y2="207" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="211.0" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.001</text><line x1="64" y1="146.67" x2="894" y2="146.67" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="146.67" x2="64" y2="146.67" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="150.7" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.01</text><line x1="64" y1="86.33" x2="894" y2="86.33" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="86.33" x2="64" y2="86.33" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="90.3" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.1</text><line x1="64" y1="26" x2="894" y2="26" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="26" x2="64" y2="26" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="30.0" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">1</text><rect x="64" y="26" width="830" height="362" fill="none" stroke="#2a2a38" stroke-width="1.5"/><text x="479.0" y="426" fill="#f3efe6" font-size="15" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">number of parts  N</text><text x="18" y="207.0" fill="#f3efe6" font-size="15" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif" transform="rotate(-90 18 207.0)">chance all of them fail</text><text x="64" y="17" fill="#f3efe6" font-size="15" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">One part fails 1 in 10 · what N parts do</text><polyline points="64,86.33 230,146.67 396,207 562,267.33 728,327.67 894,388" fill="none" stroke="#8fe0a8" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1.0"/><circle cx="64" cy="86.33" r="3" fill="#8fe0a8" stroke="none" stroke-width="0"/><circle cx="230" cy="146.67" r="3" fill="#8fe0a8" stroke="none" stroke-width="0"/><circle cx="396" cy="207" r="3" fill="#8fe0a8" stroke="none" stroke-width="0"/><circle cx="562" cy="267.33" r="3" fill="#8fe0a8" stroke="none" stroke-width="0"/><circle cx="728" cy="327.67" r="3" fill="#8fe0a8" stroke="none" stroke-width="0"/><circle cx="894" cy="388" r="3" fill="#8fe0a8" stroke="none" stroke-width="0"/><polyline points="64,84.08 230,128.64 396,144.19 562,146.41 728,146.64 894,146.66" fill="none" stroke="#8fd0ff" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" opacity="1.0" stroke-dasharray="6 5"/><circle cx="64" cy="84.08" r="2.6" fill="#8fd0ff" stroke="none" stroke-width="0"/><circle cx="230" cy="128.64" r="2.6" fill="#8fd0ff" stroke="none" stroke-width="0"/><circle cx="396" cy="144.19" r="2.6" fill="#8fd0ff" stroke="none" stroke-width="0"/><circle cx="562" cy="146.41" r="2.6" fill="#8fd0ff" stroke="none" stroke-width="0"/><circle cx="728" cy="146.64" r="2.6" fill="#8fd0ff" stroke="none" stroke-width="0"/><circle cx="894" cy="146.66" r="2.6" fill="#8fd0ff" stroke="none" stroke-width="0"/><polyline points="64,80.07 230,110.54 396,117.05 562,117.8 728,117.87 894,117.88" fill="none" stroke="#ffb347" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" opacity="1.0" stroke-dasharray="6 5"/><circle cx="64" cy="80.07" r="2.6" fill="#ffb347" stroke="none" stroke-width="0"/><circle cx="230" cy="110.54" r="2.6" fill="#ffb347" stroke="none" stroke-width="0"/><circle cx="396" cy="117.05" r="2.6" fill="#ffb347" stroke="none" stroke-width="0"/><circle cx="562" cy="117.8" r="2.6" fill="#ffb347" stroke="none" stroke-width="0"/><circle cx="728" cy="117.87" r="2.6" fill="#ffb347" stroke="none" stroke-width="0"/><circle cx="894" cy="117.88" r="2.6" fill="#ffb347" stroke="none" stroke-width="0"/><text x="568" y="257.33" fill="#8fe0a8" font-size="13" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">independent — 0.1ᴺ</text><text x="734" y="109.88" fill="#ffb347" font-size="12" text-anchor="end" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">a shared cause sets the floor</text></svg><figcaption><b>Fig 11.</b> The straight drop is the dream: each spare cuts the failure rate ten-fold. The two dashed lines are the catch — let a common cause reach across your spares (one power feed, one supplier, one bad assumption) and the floor stops falling. Redundancy is only worth what its independence is worth. <span class="small">· computed here · Nan · hongdam.net · CC BY 4.0</span></figcaption></figure>
+
+<div class="eq">P(all <var>N</var> fail) <span class="op">=</span> <var>p</var><sup><var>N</var></sup> &nbsp; <span class="mute">(only if they fail independently)</span></div><p class="reading"><b>Reading it:</b> the chance every one of <var>N</var> parts fails at once is the single-part chance multiplied by itself <var>N</var> times — a tiny number, fast. The parenthesis is the whole ballgame: shared causes break the multiplication.</p>
+
+<h2>Move three — spread the bet</h2>
+<p>This is the law of large numbers from chapter four, put to work on purpose. Split a stake across
+many independent bets and the swing shrinks as one over the square root of their number — same
+expected return, less lurch. Harry Markowitz won a Nobel for writing this down plainly in 1952.<sup class="src"><a href="/chaos/sources/#markowitz1952">18</a></sup></p>
+
+<figure class="fig dark"><svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid meet" style="background:#050507"><rect x="64" y="26" width="830" height="342" fill="#050507"/><line x1="255.54" y1="26" x2="255.54" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="255.54" y1="368" x2="255.54" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="255.54" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">10</text><line x1="468.36" y1="26" x2="468.36" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="468.36" y1="368" x2="468.36" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="468.36" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">20</text><line x1="681.18" y1="26" x2="681.18" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="681.18" y1="368" x2="681.18" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="681.18" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">30</text><line x1="894" y1="26" x2="894" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="894" y1="368" x2="894" y2="373" stroke="#b3ac9e" stroke-width="1"/><text x="894" y="388" fill="#b3ac9e" font-size="13" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">40</text><line x1="64" y1="368" x2="894" y2="368" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="368" x2="64" y2="368" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="372.0" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0</text><line x1="64" y1="302.86" x2="894" y2="302.86" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="302.86" x2="64" y2="302.86" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="306.9" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.2</text><line x1="64" y1="237.71" x2="894" y2="237.71" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="237.71" x2="64" y2="237.71" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="241.7" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.4</text><line x1="64" y1="172.57" x2="894" y2="172.57" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="172.57" x2="64" y2="172.57" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="176.6" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.6</text><line x1="64" y1="107.43" x2="894" y2="107.43" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="107.43" x2="64" y2="107.43" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="111.4" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">0.8</text><line x1="64" y1="42.29" x2="894" y2="42.29" stroke="#1c1c28" stroke-width="1"/><line x1="59" y1="42.29" x2="64" y2="42.29" stroke="#b3ac9e" stroke-width="1"/><text x="55" y="46.3" fill="#b3ac9e" font-size="13" text-anchor="end" font-family="Avenir Next,system-ui,sans-serif">1</text><rect x="64" y="26" width="830" height="342" fill="none" stroke="#2a2a38" stroke-width="1.5"/><text x="479.0" y="406" fill="#f3efe6" font-size="15" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif">number of independent bets  N</text><text x="18" y="197.0" fill="#f3efe6" font-size="15" text-anchor="middle" font-family="Avenir Next,system-ui,sans-serif" transform="rotate(-90 18 197.0)">size of the swing</text><text x="64" y="17" fill="#f3efe6" font-size="15" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">Spread the stake · the swing falls as 1/√N</text><polyline points="64,42.29 85.28,137.69 106.56,179.95 127.85,205.14 149.13,222.34 170.41,235.03 191.69,244.89 212.97,252.84 234.26,259.43 255.54,265 276.82,269.79 298.1,273.97 319.38,277.66 340.67,280.95 361.95,283.9 383.23,286.57 404.51,289 425.79,291.23 447.08,293.28 468.36,295.17 489.64,296.92 510.92,298.56 532.21,300.08 553.49,301.51 574.77,302.86 596.05,304.12 617.33,305.32 638.62,306.45 659.9,307.52 681.18,308.53 702.46,309.5 723.74,310.42 745.03,311.3 766.31,312.14 787.59,312.94 808.87,313.71 830.15,314.45 851.44,315.16 872.72,315.84 894,316.5" fill="none" stroke="#ffb347" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" opacity="1.0"/><polyline points="64,42.29 85.28,115.7 106.56,145.49 127.85,162 149.13,172.57 170.41,179.95 191.69,185.4 212.97,189.6 234.26,192.93 255.54,195.65 276.82,197.9 298.1,199.8 319.38,201.43 340.67,202.83 361.95,204.06 383.23,205.14 404.51,206.1 425.79,206.96 447.08,207.73 468.36,208.43 489.64,209.07 510.92,209.65 532.21,210.18 553.49,210.67 574.77,211.12 596.05,211.53 617.33,211.92 638.62,212.28 659.9,212.61 681.18,212.93 702.46,213.22 723.74,213.5 745.03,213.76 766.31,214.01 787.59,214.24 808.87,214.46 830.15,214.66 851.44,214.86 872.72,215.05 894,215.23" fill="none" stroke="#8fd0ff" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round" opacity="1.0" stroke-dasharray="6 5"/><line x1="64" y1="222.34" x2="894" y2="222.34" stroke="#b3ac9e" stroke-width="1.2" stroke-dasharray="3 6" opacity="1.0"/><text x="559.49" y="291.51" fill="#ffb347" font-size="13" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">all independent — keeps falling</text><text x="559.49" y="202.67" fill="#8fd0ff" font-size="12" text-anchor="start" font-weight="700" font-family="Avenir Next,system-ui,sans-serif">20% shared — stops at a floor</text></svg><figcaption><b>Fig 12.</b> Spread across independent bets and the swing keeps falling. But the moment the bets share a common risk — one market, one weather, one rumour — the fall stops at a floor no further spreading can get under. That floor is the shared risk, and only a different kind of bet removes it. <span class="small">· computed here · Nan · hongdam.net · CC BY 4.0</span></figcaption></figure>
+
+<h2>Move four — stay off the edge</h2>
+<p>Chapter two showed a wall where a steady system tips into chaos, with the forks crowding up to it.
+A resilient system is run with room to that wall, not parked against it for the last drop of yield. C.
+S. Holling, studying forests and fisheries, drew the line between two things people muddle: how fast a
+system springs back, and how big a shock it can take before it flips to a different world
+entirely.<sup class="src"><a href="/chaos/sources/#holling1973">19</a></sup> Slack is what buys the
+second one. A system with no slack is fast and efficient right up until the day it is neither.</p>
+
+<div class="win"><h3>The tool, in one line each</h3>
+<p><strong>Pull back to centre</strong> — wire in something that corrects error on its own.<br>
+<strong>Keep spares</strong> — and guard their independence harder than the spares themselves.<br>
+<strong>Spread the bet</strong> — many small uncorrelated exposures beat one big right guess.<br>
+<strong>Stay off the edge</strong> — keep margin to the tipping point; measure the shock you can take,
+not only the speed you bounce back.</p>
+<p class="mute">None of these needs a forecast. That is the point. You are not trying to out-guess the
+chaos. You are building something that does not need to.</p></div>
+
+<div class="next"><a href="/chaos/large-numbers/">← Tool one: large numbers</a><a href="/chaos/code/">Do it yourself →</a></div>
+</main><footer class="bot"><div class="in">
+<p><b>Chaos, Drawn</b> — Chaos theory in plain words — every picture drawn from the equation that makes it, and the two tools that hold up under chaos: the law of large numbers, and systems built to bend.</p>
+<p class="small">Text and pictures CC BY 4.0. The code that draws them is MIT. Every figure is
+computed by <a href="/chaos/code/">the code on this site</a>; nothing here is a stock image.
+Built 2026-09-26.</p>
+<div class="fleet">More from the same shelf: <a href="https://nanobotco.github.io/three-body/" title="the mathematics of the three-body problem in plain words, with the orbits found rather than copied">The Three-Body Problem</a> · <a href="https://nanobotco.github.io/black-holes/" title="black holes modelled and drawn from the equations — generators, the past, present and future, the legends">Black Holes, Drawn</a> · <a href="https://nanobotco.github.io/quantum-computing/" title="the history and theory of quantum computing in plain words, with demos; refreshed weekly">Quantum Computing, plainly</a> · <a href="https://nanobotco.github.io/factoring/" title="factoring from Eratosthenes to Shor — the records, the Riemann Hypothesis, and what it means for a bitcoin wallet; a hundred zeta zeros computed, every claim beside what it did">Big Numbers, Split</a> · <a href="https://nanobotco.github.io/exceptional-magic/" title="the octonions, triality, the magic square and E8, computed and drawn — a plain-spoken reading of one paper">Exceptional Magic</a></div>
+<div class="fleet">Also from NaNoBotCo: <a href="https://motdang.net/" title="city directory for Chiang Mai and Chiang Rai">Mot Dang</a> · <a href="https://nanobotco.github.io/mae-hong-son-loop/" title="motorcycling the 600 km loop out of Chiang Mai — curves counted, air measured">The Mae Hong Son Loop</a> · <a href="https://motdang.net/muay-thai/" title="the eight limbs, the thirty named techniques, the ceremony, and every gym on the map">Muay Thai</a> · <a href="https://motdang.net/roads/" title="the square of 1296, four rings, and what each one did to the city — counted from the map">Roads of Chiang Mai</a> · <a href="https://wichaa.net/" title="Lanna manuscripts, the amulet market, and the traditions around them">wichaa</a> · <a href="https://nanobotco.github.io/hand-poke/" title="28 traditions of marking skin by hand — the leg-tattoo zone of Burma, the Shan States and Lanna, counted">Hand Poke</a> · <a href="https://nanobotco.github.io/black-holes/" title="black holes modelled and drawn from the equations — generators, the past, present and future, the legends">Black Holes, Drawn</a> · <a href="https://nanobotco.github.io/quantum-computing/" title="the history and theory of quantum computing in plain words, with demos; refreshed weekly">Quantum Computing, plainly</a> · <a href="https://nanobotco.github.io/goin-fast/" title="a dirt-simple explainer about speed — twenty measured speeds from the ground under the house to light, and what each one costs">Goin&#x27; Fast</a> · <a href="https://nanobotco.github.io/three-body/" title="the mathematics of the three-body problem in plain words, with the orbits found rather than copied">The Three-Body Problem</a> · <a href="https://nanobotco.github.io/exceptional-magic/" title="the octonions, triality, the magic square and E8, computed and drawn — a plain-spoken reading of one paper">Exceptional Magic</a> · <a href="https://nanobotco.github.io/factoring/" title="factoring from Eratosthenes to Shor — the records, the Riemann Hypothesis, and what it means for a bitcoin wallet; a hundred zeta zeros computed, every claim beside what it did">Big Numbers, Split</a> · <a href="https://nanobotco.github.io/amulet-atlas/" title="amulets, charms and talismans worldwide">Amulet Atlas</a> · <a href="https://nanobotco.github.io/carolina-barbecue/" title="barbecue in North and South Carolina">Carolina Barbecue</a> · <a href="https://nanobotco.github.io/buffalo-wings/" title="the American chicken wing">Wing Country</a> · <a href="https://nanobotco.github.io/pink-box/" title="the American mom-and-pop donut shop">Pink Box</a> · <a href="https://nanobotco.github.io/basque-tables/" title="Basque dining rooms of California, Nevada and Idaho">Basque Tables</a> · <a href="https://nanobotco.github.io/pinot-noir/" title="pinot noir: the vine, the regions, the cellars">Pinot Country</a> · <a href="https://nanobotco.github.io/care-abroad/" title="treatment across borders, with published prices and their dates">Care Abroad</a> · <a href="https://nanobotco.github.io/thairoots/" title="a root dictionary of Thai, with a word decomposer">Thai Roots</a> · <a href="https://nanobotco.github.io/index/" title="every corpus, site and repository, counted">The index</a> · <a href="https://nanobotco.github.io/uptake/" title="a field manual on publishing for machines that copy">Uptake</a> · <a href="https://nanobotco.github.io/" title="the portal">NaNoBotCo</a> · <a href="https://hakfarang.net/" title="เรื่องเงิน วีซ่า และชีวิตกับแฟนฝรั่ง">ฮักฝรั่ง</a> · <a href="https://offrampt.net/" title="turning crypto into spendable local money, Thailand first">Offrampt</a></div>
+<div class="support">Contact: Nan · <a href="mailto:nan@motdang.net">nan@motdang.net</a> · Sponsor: <a href="https://www.patreon.com/nanobotco" rel="noopener" target="_blank">Patreon</a> · <a href="https://ko-fi.com/defiantchiangmai" rel="noopener" target="_blank">Ko-fi</a> · Source: <a href="https://github.com/NaNoBotCo/chaos" rel="noopener">GitHub</a></div>
+<div class="support maker">Made by <a href="https://hongdam.net/" rel="noopener">Hongdam</a>, Chiang Rai.</div>
+</div></footer></body></html>

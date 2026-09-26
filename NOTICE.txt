@@ -1,0 +1,19 @@
+Chaos, Drawn — what is in this repository, and under what terms.
+
+CODE — tools/, tests/, chaos.py, publish.sh
+    SPDX-License-Identifier: MIT — see LICENSE-CODE.
+
+TEXT, DIAGRAMS AND PICTURES — the pages in docs/, the SVG figures in them, README.md
+    SPDX-License-Identifier: CC-BY-4.0 — see LICENSE. Credit line: "Nan · hongdam.net · CC BY 4.0",
+    with a link to https://nanobotco.github.io/chaos/ .
+    Every figure was computed by tools/figures.py from the equation it illustrates. None is traced
+    from, or a copy of, anyone else's image.
+
+QUOTED AND CITED MATERIAL
+    Papers and books are cited by number on the sources page and linked. No long quotation is used.
+    The Feigenbaum constant, the Lorenz parameters and the logistic map are common mathematical
+    knowledge; the sources page names who found what.
+
+ROSTER — data/fleet.json, tools/fleet.py
+    The publisher's list of sites, copied from the index repository so a clone carries the whole
+    list with it. Regenerate with tools/fleet_sync.py in the index repository.
