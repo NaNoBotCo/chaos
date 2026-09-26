@@ -1,13 +1,13 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Do it yourself — the code — Chaos, Drawn</title>
-<meta name="description" content="The mathematics behind every figure, in a few lines of dependency-free Python you can run and change.">
-<link rel="canonical" href="https://nanobotco.github.io/chaos/code/">
-<meta property="og:type" content="website"><meta property="og:title" content="Do it yourself — the code — Chaos, Drawn">
-<meta property="og:description" content="The mathematics behind every figure, in a few lines of dependency-free Python you can run and change."><meta property="og:url" content="https://nanobotco.github.io/chaos/code/">
+<title>Play — turn the knobs — Chaos, Drawn</title>
+<meta name="description" content="Interactive chaos: drag the logistic knob, steer the Lorenz butterfly, roll the law of large numbers, tame a shock with feedback — all computed live in the browser.">
+<link rel="canonical" href="https://nanobotco.github.io/chaos/play/">
+<meta property="og:type" content="website"><meta property="og:title" content="Play — turn the knobs — Chaos, Drawn">
+<meta property="og:description" content="Interactive chaos: drag the logistic knob, steer the Lorenz butterfly, roll the law of large numbers, tame a shock with feedback — all computed live in the browser."><meta property="og:url" content="https://nanobotco.github.io/chaos/play/">
 <meta property="og:image" content="https://nanobotco.github.io/chaos/card.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:site_name" content="Chaos, Drawn"><meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Do it yourself — the code — Chaos, Drawn"><meta name="twitter:description" content="The mathematics behind every figure, in a few lines of dependency-free Python you can run and change.">
+<meta name="twitter:title" content="Play — turn the knobs — Chaos, Drawn"><meta name="twitter:description" content="Interactive chaos: drag the logistic knob, steer the Lorenz butterfly, roll the law of large numbers, tame a shock with feedback — all computed live in the browser.">
 <meta name="twitter:image" content="https://nanobotco.github.io/chaos/card.jpg">
 <meta name="theme-color" content="#07070b">
 <link rel="icon" href="/chaos/icon.svg" type="image/svg+xml">
@@ -321,112 +321,23 @@ figure.fig svg{display:block;width:100%;height:auto}
 <a class="sr" href="#main">Skip to the content</a>
 <header class="top"><div class="in">
 <a class="brand" href="/chaos/"><i></i>Chaos, <b>Drawn</b></a>
-<nav aria-label="Chapters"><a href="/chaos/one/">The one idea</a><a href="/chaos/map/">The map</a><a href="/chaos/weather/">Weather</a><a href="/chaos/large-numbers/">Large numbers</a><a href="/chaos/resilience/">Resilience</a><a href="/chaos/play/">Play</a><a href="/chaos/code/" aria-current=page>Code</a><a href="/chaos/words/">Words</a><a href="/chaos/sources/">Sources</a></nav>
+<nav aria-label="Chapters"><a href="/chaos/one/">The one idea</a><a href="/chaos/map/">The map</a><a href="/chaos/weather/">Weather</a><a href="/chaos/large-numbers/">Large numbers</a><a href="/chaos/resilience/">Resilience</a><a href="/chaos/play/" aria-current=page>Play</a><a href="/chaos/code/">Code</a><a href="/chaos/words/">Words</a><a href="/chaos/sources/">Sources</a></nav>
 </div></header><main id="main">
-<h1><span class="kind">Chapter 6</span>Do it yourself</h1>
-<p class="lede">Every picture on this site comes out of a few lines of plain Python with nothing
-imported but the standard library. Here is the heart of it. Copy it, run it, change the numbers,
-break it.</p>
-
-<p><a class="btn solid" href="/chaos/chaos.py" download>Download chaos.py</a> &nbsp;
-<a class="btn" href="https://github.com/NaNoBotCo/chaos">The full source on GitHub</a></p>
-
-<pre><code>#!/usr/bin/env python3
-&quot;&quot;&quot;chaos.py — the whole site&#x27;s mathematics, no libraries, runs in a second.
-
-    python3 chaos.py
-
-Prints: a chaotic run you can&#x27;t forecast, the average of a chaotic pile that never moves,
-the weather model&#x27;s Lyapunov exponent, and one feedback loop taming a run of shocks.
-&quot;&quot;&quot;
-import math, random
-
-
-def logistic(r, x, n):
-    &quot;The rabbit rule: where you are, times the growth knob, times the room left.&quot;
-    for _ in range(n):
-        x = r * x * (1 - x)
-        yield x
-
-
-def lorenz_step(s, dt=0.006, sig=10, rho=28, beta=8/3):
-    x, y, z = s
-    def d(st):
-        x, y, z = st
-        return (sig*(y-x), x*(rho-z)-y, x*y-beta*z)
-    k1 = d(s)
-    k2 = d((x+dt/2*k1[0], y+dt/2*k1[1], z+dt/2*k1[2]))
-    k3 = d((x+dt/2*k2[0], y+dt/2*k2[1], z+dt/2*k2[2]))
-    k4 = d((x+dt*k3[0],   y+dt*k3[1],   z+dt*k3[2]))
-    return tuple(s[i] + dt/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]) for i in range(3))
-
-
-def lyapunov(dt=0.006, n=60000, d0=1e-9):
-    &quot;Benettin&#x27;s method: run a twin a hair away, measure the growth, pull it back, repeat.&quot;
-    a = (1.0, 1.0, 1.0)
-    for _ in range(4000):            # settle onto the attractor
-        a = lorenz_step(a, dt)
-    b = (a[0]+d0, a[1], a[2])
-    total = 0.0
-    for _ in range(n):
-        a, b = lorenz_step(a, dt), lorenz_step(b, dt)
-        gap = math.dist(a, b)
-        total += math.log(gap/d0)
-        f = d0/gap                   # rescale the twin back to distance d0
-        b = (a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f, a[2]+(b[2]-a[2])*f)
-    return total/(n*dt)
-
-
-def die_average(n, seed=70118):
-    rng = random.Random(seed)
-    s = 0
-    for i in range(1, n+1):
-        s += rng.randint(1, 6)
-    return s/n
-
-
-def governor(k=0.28, n=240, seed=4669):
-    &quot;One feedback loop against a run of shocks: subtract k of the error each step.&quot;
-    rng = random.Random(seed)
-    drift = held = 0.0
-    for _ in range(n):
-        shock = rng.gauss(0, 1) * 0.5
-        drift += shock                       # no correction
-        held += shock; held -= k * held      # pull back k of the error
-    return drift, held
-
-
-if __name__ == &quot;__main__&quot;:
-    run = list(logistic(4.0, 0.4, 12))
-    print(&quot;chaotic run (unforecastable):&quot;, &quot; &quot;.join(f&quot;{v:.3f}&quot; for v in run))
-
-    pile = list(logistic(4.0, 0.31415926, 300000))
-    print(&quot;average of 300,000 chaotic values:&quot;, round(sum(pile)/len(pile), 4), &quot;(theory 0.5)&quot;)
-
-    print(&quot;Lyapunov exponent of the weather model:&quot;, round(lyapunov(), 3), &quot;(known 0.906)&quot;)
-
-    print(&quot;die average over 3,000 rolls:&quot;, round(die_average(3000), 3), &quot;(true 3.5)&quot;)
-
-    drift, held = governor()
-    print(f&quot;shock left alone drifted to {drift:.2f}; one feedback loop held it to {held:.2f}&quot;)
-</code></pre>
-
-<h2>What it prints</h2>
-<p>Run <code>python3 chaos.py</code> and you get, in order: a dozen steps of the fully chaotic rabbit
-map (you will not be able to forecast the thirteenth); the average of three hundred thousand of those
-same chaotic values, which sits on 0.5 every time; the weather model's Lyapunov exponent, measured
-the way chapter three measured it, landing near the textbook 0.906; the average of three thousand die
-rolls, near 3.5; and a single feedback loop pulling a run of shocks back to centre.</p>
-<p>Six functions, one file, no dependencies. The chaos, the two tools, and the proof that the pile
-holds still while the grains jump — all of it fits on a page.</p>
-
-<div class="win"><h3>Things worth breaking</h3>
-<p>Change the logistic knob from 4.0 to 3.5 and watch the “chaotic” run turn into a clean four-beat.
-Set the governor pull-back <code>k</code> above 2 and watch the correction overshoot into its own
-chaos. Widen the twin's head start <code>d0</code> and see the Lyapunov number barely budge — it is a
-property of the system, not of how you poke it.</p></div>
-
-<div class="next"><a href="/chaos/resilience/">← Tool two: build to bend</a><a href="/chaos/words/">The words →</a></div>
+<h1><span class="kind">Play</span>Turn the knobs yourself</h1>
+<p class="lede">The static pages drew chaos once. Here it runs live: every demo steps the same
+equations in your browser as you drag. Nothing is pre-recorded — you are computing it.</p>
+<p class="mute small">Reads best on a wide screen. Motion respects your reduced-motion setting.</p>
+<h2>1 · The logistic lab</h2><p>Drag the growth knob <var>r</var>. The staircase on the left, the beat over time in the middle, and the whole family on the right all update as you move it. Click the family picture to jump the knob straight to any setting — watch one value split to two, to four, then into the fog.</p><div class="gen"><div class="stage"><div class="three" style="margin:0"><canvas id="lab-cobweb"></canvas><canvas id="lab-series"></canvas><canvas id="lab-bif"></canvas></div></div><div class="ctl"><label for="lab-r">growth knob r<output id="lab-r-out"></output></label><input type="range" id="lab-r" min="2.5" max="4.0" step="0.001" value="3.2"><label for="lab-x0">where it starts<output id="lab-x0-out"></output></label><input type="range" id="lab-x0" min="0.01" max="0.99" step="0.01" value="0.40"></div><p class="read" id="lab-read"></p></div>
+<h2>2 · Two starts, a hair apart</h2><p>Set how close the two starts are, and the growth knob. They track as one line, then part. Widen the gap and they part later; tighten it and chaos still pulls them apart — it only takes longer.</p><div class="gen"><div class="stage"><canvas id="div-canvas"></canvas></div><div class="ctl"><label for="div-r">growth knob r<output id="div-r-out"></output></label><input type="range" id="div-r" min="3.5" max="4.0" step="0.001" value="3.9"><label for="div-gap">start them this close (10⁻ⁿ)<output id="div-gap-out"></output></label><input type="range" id="div-gap" min="1" max="6" step="1" value="4"></div><div class="row"><button id="div-replay" type="button">Run it again</button></div></div>
+<h2>3 · The Lorenz butterfly, live</h2><p>The weather model, drawing itself. Turn <var>ρ</var> down and it settles to a point or a loop; turn it up past about 24.7 and the butterfly opens. Switch on the twin to release a second start a thousandth away and watch the gap between them grow.</p><div class="gen"><div class="stage"><canvas id="lz-canvas"></canvas></div><div class="ctl"><label for="lz-rho">heat knob ρ<output id="lz-rho-out"></output></label><input type="range" id="lz-rho" min="0.5" max="60" step="0.5" value="28"><label style="display:flex;align-items:center;gap:.5rem;text-transform:none;letter-spacing:0"><input type="checkbox" id="lz-twin" style="accent-color:#ffb347;width:auto"> release a twin a hair away</label></div><div class="row"><button id="lz-reset" type="button">Restart</button></div><p class="read" id="lz-read"></p></div>
+<h2>4 · The law of large numbers</h2><p>Roll the die. One roll is anyone's guess; keep the running average and it is reeled in to 3.5. The shaded funnel is how far off to expect, and it closes as one over the square root of the number of rolls.</p><div class="gen"><div class="stage"><canvas id="dice-canvas"></canvas></div><div class="ctl"><span class="mute small">Roll a fair die and watch the average settle.</span></div><div class="row"><button id="dice-1" type="button">Roll one</button><button id="dice-100" type="button">Roll 100</button><button id="dice-1000" type="button">Roll 1,000</button><button id="dice-reset" class="ghost" type="button">Reset</button></div><p class="read" id="dice-read"></p></div>
+<h2>5 · The governor</h2><p>Two tanks take the same run of random shocks. The red one has no feedback and wanders off; the green one subtracts a share of its own error every step and holds near centre. Drag the pull-back, and hit it with a shock to see it recover.</p><div class="gen"><div class="stage"><canvas id="gov-canvas"></canvas></div><div class="ctl"><label for="gov-k">pull back this much each step<output id="gov-k-out"></output></label><input type="range" id="gov-k" min="0" max="1" step="0.01" value="0.28"></div><div class="row"><button id="gov-kick" type="button">Hit it with a shock</button><button id="gov-reset" class="ghost" type="button">Reset</button></div></div>
+<div class="win"><h3>Same mathematics, two forms</h3>
+<p>Every knob here drives the exact rule from the chapters — the logistic map, the Lorenz system,
+a running average, one feedback loop. Read the <a href="/chaos/">walk-through</a> for what you are
+seeing, or take the whole thing as <a href="/chaos/code/">a few lines of Python</a>.</p></div>
+<div class="next"><a href="/chaos/resilience/">← Build it to bend</a><a href="/chaos/code/">Do it yourself →</a></div>
+<script defer src="/chaos/play/play.js"></script>
 </main><footer class="bot"><div class="in">
 <p><b>Chaos, Drawn</b> — Chaos theory in plain words — every picture drawn from the equation that makes it, and the two tools that hold up under chaos: the law of large numbers, and systems built to bend.</p>
 <p class="small">Text and pictures CC BY 4.0. The code that draws them is MIT. Every figure is
