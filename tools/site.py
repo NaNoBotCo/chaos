@@ -42,7 +42,7 @@ SIB = ("three-body", "black-holes", "quantum-computing", "factoring", "exception
 
 NAV = [("one/", "The one idea"), ("map/", "The map"), ("weather/", "Weather"),
        ("large-numbers/", "Large numbers"), ("resilience/", "Resilience"),
-       ("code/", "Code"), ("words/", "Words"), ("sources/", "Sources")]
+       ("play/", "Play"), ("code/", "Code"), ("words/", "Words"), ("sources/", "Sources")]
 
 EXTRA = """
 .reading{max-width:44rem;margin:.1rem 0 1.2rem;color:var(--ink);font-size:1rem}
@@ -179,10 +179,12 @@ see far ahead. That is the catch, and it is the whole of it. The rest of this si
 catch looks like, why it happens, and what to do about it.</p>
 </div>
 
+<p><a class="btn solid" href="{u('play/')}">Play with it → turn the knobs yourself</a></p>
+
 <h2>Walk it in order</h2>
 {toc([("one/","1 · The one idea"),("map/","2 · One rule into chaos"),("weather/","3 · Weather & the butterfly"),
       ("large-numbers/","4 · Tool one: large numbers"),("resilience/","5 · Tool two: build to bend"),
-      ("code/","6 · Do it yourself")])}
+      ("play/","Play · turn the knobs"),("code/","6 · Do it yourself")])}
 
 <div class="pair">
 {fig("bifurcation", "One equation, every setting at once. Turn the knob left to right and a single steady value splits to two, to four, and then into a fog — that fog is chaos.")}
@@ -632,6 +634,98 @@ def page_words():
     write("words/index.html", head("The words — " + NAME, "A plain-language glossary of chaos theory: sensitive dependence, attractors, Lyapunov exponents, the law of large numbers, resilience.", "words/") + body + foot())
 
 
+def demo(title, intro, stage, ctl, row="", read_id=""):
+    r = f'<div class="row">{row}</div>' if row else ""
+    rd = f'<p class="read" id="{read_id}"></p>' if read_id else ""
+    return (f'<h2>{title}</h2><p>{intro}</p>'
+            f'<div class="gen"><div class="stage">{stage}</div>'
+            f'<div class="ctl">{ctl}</div>{r}{rd}</div>')
+
+
+def rng(id_, lo, hi, step, val, label):
+    return (f'<label for="{id_}">{label}<output id="{id_}-out"></output></label>'
+            f'<input type="range" id="{id_}" min="{lo}" max="{hi}" step="{step}" value="{val}">')
+
+
+def page_play():
+    lab = demo(
+        "1 · The logistic lab",
+        "Drag the growth knob <var>r</var>. The staircase on the left, the beat over time in the "
+        "middle, and the whole family on the right all update as you move it. Click the family "
+        "picture to jump the knob straight to any setting — watch one value split to two, to four, "
+        "then into the fog.",
+        '<div class="three" style="margin:0"><canvas id="lab-cobweb"></canvas>'
+        '<canvas id="lab-series"></canvas><canvas id="lab-bif"></canvas></div>',
+        rng("lab-r", "2.5", "4.0", "0.001", "3.2", "growth knob r") +
+        rng("lab-x0", "0.01", "0.99", "0.01", "0.40", "where it starts"),
+        read_id="lab-read")
+
+    div = demo(
+        "2 · Two starts, a hair apart",
+        "Set how close the two starts are, and the growth knob. They track as one line, then part. "
+        "Widen the gap and they part later; tighten it and chaos still pulls them apart — it only "
+        "takes longer.",
+        '<canvas id="div-canvas"></canvas>',
+        rng("div-r", "3.5", "4.0", "0.001", "3.9", "growth knob r") +
+        rng("div-gap", "1", "6", "1", "4", "start them this close (10⁻ⁿ)"),
+        row='<button id="div-replay" type="button">Run it again</button>')
+
+    lz = demo(
+        "3 · The Lorenz butterfly, live",
+        "The weather model, drawing itself. Turn <var>ρ</var> down and it settles to a point or a "
+        "loop; turn it up past about 24.7 and the butterfly opens. Switch on the twin to release a "
+        "second start a thousandth away and watch the gap between them grow.",
+        '<canvas id="lz-canvas"></canvas>',
+        rng("lz-rho", "0.5", "60", "0.5", "28", "heat knob ρ") +
+        '<label style="display:flex;align-items:center;gap:.5rem;text-transform:none;letter-spacing:0">'
+        '<input type="checkbox" id="lz-twin" style="accent-color:#ffb347;width:auto"> release a twin a hair away</label>',
+        row='<button id="lz-reset" type="button">Restart</button>',
+        read_id="lz-read")
+
+    dice = demo(
+        "4 · The law of large numbers",
+        "Roll the die. One roll is anyone's guess; keep the running average and it is reeled in to "
+        "3.5. The shaded funnel is how far off to expect, and it closes as one over the square root "
+        "of the number of rolls.",
+        '<canvas id="dice-canvas"></canvas>',
+        '<span class="mute small">Roll a fair die and watch the average settle.</span>',
+        row='<button id="dice-1" type="button">Roll one</button>'
+            '<button id="dice-100" type="button">Roll 100</button>'
+            '<button id="dice-1000" type="button">Roll 1,000</button>'
+            '<button id="dice-reset" class="ghost" type="button">Reset</button>',
+        read_id="dice-read")
+
+    gov = demo(
+        "5 · The governor",
+        "Two tanks take the same run of random shocks. The red one has no feedback and wanders off; "
+        "the green one subtracts a share of its own error every step and holds near centre. Drag the "
+        "pull-back, and hit it with a shock to see it recover.",
+        '<canvas id="gov-canvas"></canvas>',
+        rng("gov-k", "0", "1", "0.01", "0.28", "pull back this much each step"),
+        row='<button id="gov-kick" type="button">Hit it with a shock</button>'
+            '<button id="gov-reset" class="ghost" type="button">Reset</button>')
+
+    body = f"""
+<h1><span class="kind">Play</span>Turn the knobs yourself</h1>
+<p class="lede">The static pages drew chaos once. Here it runs live: every demo steps the same
+equations in your browser as you drag. Nothing is pre-recorded — you are computing it.</p>
+<p class="mute small">Reads best on a wide screen. Motion respects your reduced-motion setting.</p>
+{lab}
+{div}
+{lz}
+{dice}
+{gov}
+<div class="win"><h3>Same mathematics, two forms</h3>
+<p>Every knob here drives the exact rule from the chapters — the logistic map, the Lorenz system,
+a running average, one feedback loop. Read the <a href="{u('')}">walk-through</a> for what you are
+seeing, or take the whole thing as <a href="{u('code/')}">a few lines of Python</a>.</p></div>
+{nextlink(("resilience/", "Build it to bend"), ("code/", "Do it yourself"))}
+<script defer src="{u('play/play.js')}"></script>
+"""
+    write("play/index.html", head("Play — turn the knobs — " + NAME, "Interactive chaos: drag the logistic knob, steer the Lorenz butterfly, roll the law of large numbers, tame a shock with feedback — all computed live in the browser.", "play/") + body + foot())
+    (SITE / "play" / "play.js").write_text((ROOT / "js" / "play.js").read_text(encoding="utf-8"), encoding="utf-8")
+
+
 def page_sources():
     body = f"""
 <h1><span class="kind">Sources</span>Where this comes from</h1>
@@ -666,7 +760,7 @@ def machine_files():
         "background_color": "#07070b", "theme_color": "#07070b",
         "icons": [{"src": u("icon.svg"), "sizes": "any", "type": "image/svg+xml"}]}, indent=2) + "\n", encoding="utf-8")
 
-    pages = ["", "one/", "map/", "weather/", "large-numbers/", "resilience/", "code/", "words/", "sources/"]
+    pages = ["", "one/", "map/", "weather/", "large-numbers/", "resilience/", "play/", "code/", "words/", "sources/"]
     urls = "".join(f"<url><loc>{SITE_URL}/{p}</loc><lastmod>{TODAY}</lastmod></url>" for p in pages)
     (SITE / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n',
@@ -706,7 +800,7 @@ def machine_files():
 def build_all():
     SITE.mkdir(parents=True, exist_ok=True)
     page_home(); page_one(); page_map(); page_weather()
-    page_large(); page_resilience(); page_code(); page_words(); page_sources()
+    page_large(); page_resilience(); page_play(); page_code(); page_words(); page_sources()
     page_404()
     touched = machine_files()
     n = len(list(SITE.rglob("index.html")))
