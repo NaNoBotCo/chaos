@@ -1,7 +1,7 @@
 /* Chaos, Drawn */
 Chaos theory in plain words — every picture drawn from the equation that makes it, and the two tools that hold up under chaos: the law of large numbers, and systems built to bend.
 
-Built 2026-09-26. Figures computed by tools/figures.py.
+Built 2026-09-28. Figures computed by tools/figures.py.
 Text & figures CC BY 4.0 · code MIT.
 
 # — roster of sibling sites, generated from data/fleet.json —
