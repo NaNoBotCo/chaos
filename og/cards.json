@@ -1,4 +1,8 @@
 {
+ "./": {
+  "alt": "Card: Chaos, Drawn, with the Lorenz butterfly beside the title",
+  "image": "card.jpg"
+ },
  "code/": {
   "alt": "Card: Do it yourself, Chaos, Drawn",
   "image": "og/code.jpg"
