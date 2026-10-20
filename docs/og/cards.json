@@ -1,0 +1,38 @@
+{
+ "code/": {
+  "alt": "Card: Do it yourself, Chaos, Drawn",
+  "image": "og/code.jpg"
+ },
+ "large-numbers/": {
+  "alt": "Card: The law of large numbers, Chaos, Drawn",
+  "image": "og/large-numbers.jpg"
+ },
+ "map/": {
+  "alt": "Card: One rule into chaos, Chaos, Drawn",
+  "image": "og/map.jpg"
+ },
+ "one/": {
+  "alt": "Card: The one idea, Chaos, Drawn",
+  "image": "og/one.jpg"
+ },
+ "play/": {
+  "alt": "Card: Play, Chaos, Drawn",
+  "image": "og/play.jpg"
+ },
+ "resilience/": {
+  "alt": "Card: Build it to bend, Chaos, Drawn",
+  "image": "og/resilience.jpg"
+ },
+ "sources/": {
+  "alt": "Card: Sources, Chaos, Drawn",
+  "image": "og/sources.jpg"
+ },
+ "weather/": {
+  "alt": "Card: Weather & the butterfly, Chaos, Drawn",
+  "image": "og/weather.jpg"
+ },
+ "words/": {
+  "alt": "Card: The words, Chaos, Drawn",
+  "image": "og/words.jpg"
+ }
+}
